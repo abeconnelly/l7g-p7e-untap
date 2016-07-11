@@ -14,7 +14,7 @@ type LPUD struct {
 
 func (lpud *LPUD) Init(sql_fn string) error {
   var err error
-  lpud.DB, err = sql.Open("sqlite3", "./untap.sqlite3")
+  lpud.DB, err = sql.Open("sqlite3", sql_fn)
   if err !=nil { panic(err) }
   return nil
 }

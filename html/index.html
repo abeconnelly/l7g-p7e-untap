@@ -204,7 +204,9 @@ function sendreq_info() {
 
 function sendreq_sql() {
   var txt = [
-    'lpud_sql("select * from demographics limit 10;");'
+    'var x = lpud_sql("select * from demographics limit 10;");',
+    'var x_json = JSON.parse(x);',
+    'pheno_return(x_json, "  ");'
   ].join("\n");
   var v = document.getElementById("text").value = txt;
   sendreq();
