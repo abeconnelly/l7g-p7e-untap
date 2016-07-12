@@ -4,9 +4,13 @@ import "fmt"
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
 
+
 //import "net/http"
 //import "github.com/robertkrimen/otto"
 //import "github.com/abeconnelly/sloppyjson"
+
+import "reflect"
+import "time"
 
 type LPUD struct {
   DB *sql.DB
@@ -14,12 +18,68 @@ type LPUD struct {
 
 func (lpud *LPUD) Init(sql_fn string) error {
   var err error
-  lpud.DB, err = sql.Open("sqlite3", sql_fn)
-  if err !=nil { panic(err) }
+  //lpud.DB, err = sql.Open("sqlite3", sql_fn)
+  lpud.DB, err = sql.Open("sqlite3", "file:" + sql_fn + "?parseTime=true")
+  if err !=nil { return err }
   return nil
 }
 
 func (lpud *LPUD) SQLExec(req string) ([][]string, error ) {
+  local_debug := false
+
+  rows,err := lpud.DB.Query(req)
+  if err!=nil { return nil, err }
+  cols,e := rows.Columns() ; _ = cols
+  if e!=nil { return nil, e }
+
+  columns := make([]interface{}, len(cols))
+  columnPointers := make([]interface{}, len(cols))
+  for i:=0; i<len(cols); i++ {
+    columnPointers[i] = &columns[i]
+  }
+
+  res_str_array := [][]string{}
+
+  ti := time.Time{}
+  bt := []byte{}
+
+  res_str_array = append(res_str_array, cols)
+
+  for rows.Next() {
+    if err := rows.Scan(columnPointers...); err != nil {
+      return nil, err
+    }
+
+    strstr := []string{}
+
+    for _,raw := range columns {
+      if reflect.TypeOf(raw) == reflect.TypeOf(ti) {
+        t := raw.(time.Time)
+        s := t.String()
+        strstr = append(strstr, s)
+      } else if reflect.TypeOf(raw) == reflect.TypeOf(bt) {
+        var s = fmt.Sprintf("%s", raw.([]byte))
+        strstr = append(strstr, s)
+      } else {
+        var s = fmt.Sprintf("%v", raw)
+        strstr = append(strstr, s)
+      }
+    }
+
+    res_str_array = append(res_str_array, strstr)
+  }
+
+
+  //DEBUG
+  if local_debug { fmt.Printf(">>>>\n%v\n", res_str_array) }
+
+  return res_str_array, nil
+}
+
+func (lpud *LPUD) SQLExecS(req string) ([][]string, error ) {
+  local_debug := true
+
+
   rows,err := lpud.DB.Query(req)
   if err!=nil { return nil, err }
   cols,e := rows.Columns() ; _ = cols
@@ -28,6 +88,11 @@ func (lpud *LPUD) SQLExec(req string) ([][]string, error ) {
   rawResult := make([][]byte, len(cols))
 
   res_str_array := [][]string{}
+
+  // add column names to first row
+  //
+  res_str_array = append(res_str_array, cols)
+
 
   dest := make([]interface{}, len(cols))
   for i,_ := range rawResult {
@@ -41,13 +106,20 @@ func (lpud *LPUD) SQLExec(req string) ([][]string, error ) {
     result := make([]string, len(cols))
 
     for i,raw := range rawResult {
+      raw_type := reflect.TypeOf(raw)
       if raw==nil {
         result[i] = "\n"
+      } else if el := raw_type.Elem() ; (el.PkgPath() == "time" || el.Name() == "Time" ) {
+        result[i] = fmt.Sprintf("%v", raw)
+        //ti := raw.(time.Time)
+        //result[i] = ti.String()
       } else {
         result[i] = string(raw)
 
         //DEBUG
-        fmt.Printf("raw>>>>\n%v\n", string(raw))
+        if local_debug {
+          fmt.Printf("raw>>>>\n%v\n", string(raw))
+        }
 
       }
     }
@@ -57,7 +129,9 @@ func (lpud *LPUD) SQLExec(req string) ([][]string, error ) {
   }
 
   //DEBUG
-  fmt.Printf(">>>>\n%v\n", res_str_array)
+  if local_debug {
+    fmt.Printf(">>>>\n%v\n", res_str_array)
+  }
 
   return res_str_array, nil
 }

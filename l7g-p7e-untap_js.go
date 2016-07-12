@@ -4,6 +4,7 @@ import "fmt"
 //import "bytes"
 //import "bufio"
 import "strings"
+import "strconv"
 import "io/ioutil"
 import "github.com/robertkrimen/otto"
 
@@ -36,7 +37,6 @@ func (lpud *LPUD) sqlexec_otto(call otto.FunctionCall) otto.Value {
 
   s := _strstr_to_json(sql_ret)
 
-  //v,e := otto.ToValue(sql_ret)
   v,e := otto.ToValue(s)
   if e!=nil { return otto_err }
 
@@ -53,13 +53,15 @@ func _strstr_to_json(ssa [][]string) string {
     x = append(x, `[`)
     for j:=0; j<len(ssa[i]); j++ {
       if j>0 { x = append(x, `,`) }
-      x = append(x, `"` + ssa[i][j] + `"`)
+      //x = append(x, `"` + ssa[i][j] + `"`)
+      x = append(x, strconv.Quote(ssa[i][j]))
     }
     x = append(x, `]`)
 
   }
   x = append(x, `]`)
   x = append(x, "}")
+  //return strings.Join(x, "")
   return strings.Join(x, "")
 }
 
@@ -72,8 +74,8 @@ func (lpud *LPUD) JSVMRun(src string) (rstr string, e error) {
   if err!=nil { e = err; return }
   js_vm.Run(init_js)
 
-  js_vm.Set("status", lpud.status_otto)
-  js_vm.Set("lpud_sql", lpud.sqlexec_otto)
+  js_vm.Set("pheno_status", lpud.status_otto)
+  js_vm.Set("pheno_sql", lpud.sqlexec_otto)
 
   v,err := js_vm.Run(src)
   if err!=nil {

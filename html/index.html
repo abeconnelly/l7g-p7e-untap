@@ -202,11 +202,41 @@ function sendreq_info() {
 }
 
 
-function sendreq_sql() {
+function sendreq_tables() {
   var txt = [
-    'var x = lpud_sql("select * from demographics limit 10;");',
-    'var x_json = JSON.parse(x);',
-    'pheno_return(x_json, "  ");'
+
+    'var tables = [ "allergies",',
+    '    "human_suff_record_map",',
+    '    "suff_record",',
+    '    "conditions",',
+    '    "immunizations",',
+    '    "survey",',
+    '    "demographics",',
+    '    "insuff_record",',
+    '    "test_results",',
+    '    "enrollment_date",',
+    '    "medications",',
+    '    "uploaded_data",',
+    '    "geographic_information",',
+    '    "procedures",',
+    '    "human_insuff_record_map",',
+    '    "specimens",',
+    '    "huid_lightning_dataset_map"',
+    '    ];',
+    '',
+    'var result = {};',
+    '',
+    'for (var i=0; i<tables.length; i++) {',
+    '',
+    '  var query = "select * from " + tables[i] + " limit 2;";',
+    '',
+    '  var r = pheno_sql(query);',
+    '  var r_json = JSON.parse(r);',
+    '  result[tables[i]] = r_json;',
+    '}',
+    '',
+    'pheno_return(result, "  ");'
+
   ].join("\n");
   var v = document.getElementById("text").value = txt;
   sendreq();
@@ -256,7 +286,7 @@ function historic_req_inc() {
 		<div class="content">
       <a href='#' onclick='sendreq_info();' >example-info</a>
       <br>
-      <a href='#' onclick='sendreq_sql();' >example-sql</a>
+      <a href='#' onclick='sendreq_tables();' >example-tablesquery</a>
       <br>
 
       <a href='#' onclick='clear_textarea();' >clear</a>
