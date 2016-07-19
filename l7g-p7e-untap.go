@@ -1,19 +1,20 @@
 package main
 
 import "fmt"
+import "log"
+import "io/ioutil"
+
 import "database/sql"
 import _ "github.com/mattn/go-sqlite3"
 
-
-//import "net/http"
-//import "github.com/robertkrimen/otto"
-//import "github.com/abeconnelly/sloppyjson"
+import "github.com/abeconnelly/sloppyjson"
 
 import "reflect"
 import "time"
 
 type LPUD struct {
   DB *sql.DB
+  Port int
 }
 
 func (lpud *LPUD) Init(sql_fn string) error {
@@ -158,8 +159,18 @@ func main() {
 
   lpud := LPUD{}
 
-  err := lpud.Init("./untap.sqlite3")
-  if err!=nil { panic(err) }
+  config_s,e := ioutil.ReadFile("./l7g-p7e-config.json")
+  if e!=nil { log.Fatal(e) }
+  config_json,e := sloppyjson.Loads(string(config_s))
+  if e!=nil { log.Fatal(e) }
+
+
+
+  //err := lpud.Init("./untap.sqlite3")
+  err := lpud.Init(config_json.O["database"].S)
+  if err!=nil { log.Fatal(err) }
+
+  lpud.Port = int(config_json.O["port"].P)
 
   if local_debug {
     fmt.Printf(">> starting\n")
