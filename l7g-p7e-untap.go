@@ -19,7 +19,6 @@ type LPUD struct {
 
 func (lpud *LPUD) Init(sql_fn string) error {
   var err error
-  //lpud.DB, err = sql.Open("sqlite3", sql_fn)
   lpud.DB, err = sql.Open("sqlite3", "file:" + sql_fn + "?parseTime=true")
   if err !=nil { return err }
   return nil
@@ -140,23 +139,6 @@ func (lpud *LPUD) SQLExecS(req string) ([][]string, error ) {
 func main() {
   local_debug := true
 
-//  db, err := sql.Open("sqlite3", "./untap.sqlite3")
-//  if err !=nil { panic(err) }
-//  rows,err := db.Query("select * from demographics limit 10")
-//  if err!=nil { panic(err) }
-//  for rows.Next() {
-//    var id int
-//    var human_id string
-//    var date_of_birth string
-//    var gender string
-//    var weight string
-//    var height string
-//    var blood_type string
-//    var race string
-//    err = rows.Scan(&id, &human_id, &date_of_birth, &gender, &weight, &height, &blood_type, &race)
-//    fmt.Print(id, human_id, date_of_birth, gender, weight, height, blood_type, race, "\n")
-//  }
-
   lpud := LPUD{}
 
   config_s,e := ioutil.ReadFile("./l7g-p7e-config.json")
@@ -164,9 +146,6 @@ func main() {
   config_json,e := sloppyjson.Loads(string(config_s))
   if e!=nil { log.Fatal(e) }
 
-
-
-  //err := lpud.Init("./untap.sqlite3")
   err := lpud.Init(config_json.O["database"].S)
   if err!=nil { log.Fatal(err) }
 

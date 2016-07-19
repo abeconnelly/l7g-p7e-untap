@@ -58,7 +58,6 @@ func (lpud *LPUD) StartSrv() error {
   http.HandleFunc("/about", lpud.WebAbout)
   http.HandleFunc("/i", lpud.WebInteractive)
 
-  //e := http.ListenAndServe(":8083", nil)
   port_str := fmt.Sprintf("%d", lpud.Port)
   e := http.ListenAndServe(":" + port_str, nil)
   return e
