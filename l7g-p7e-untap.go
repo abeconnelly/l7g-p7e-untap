@@ -1,5 +1,6 @@
 package main
 
+import "os"
 import "fmt"
 import "log"
 import "io/ioutil"
@@ -141,7 +142,11 @@ func main() {
 
   lpud := LPUD{}
 
-  config_s,e := ioutil.ReadFile("./l7g-p7e-config.json")
+  cfg_fn := "./l7g-p7e-config.json"
+  if len(os.Args)>1 { cfg_fn = os.Args[1] }
+
+  //config_s,e := ioutil.ReadFile("./l7g-p7e-config.json")
+  config_s,e := ioutil.ReadFile(cfg_fn)
   if e!=nil { log.Fatal(e) }
   config_json,e := sloppyjson.Loads(string(config_s))
   if e!=nil { log.Fatal(e) }
