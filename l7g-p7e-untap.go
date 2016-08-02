@@ -15,6 +15,8 @@ import "time"
 
 type LPUD struct {
   DB *sql.DB
+  HTMLDir string
+  JSDir string
   Port int
 }
 
@@ -155,6 +157,8 @@ func main() {
   if err!=nil { log.Fatal(err) }
 
   lpud.Port = int(config_json.O["port"].P)
+  lpud.HTMLDir = config_json.O["html-dir"].S
+  lpud.JSDir = config_json.O["js-dir"].S
 
   if local_debug {
     fmt.Printf(">> starting\n")

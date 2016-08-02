@@ -1,4 +1,6 @@
 {
   "database":"./untap.sqlite3",
+  "html-dir":"./html",
+  "js-dir":"./js",
   "port":8083
 }

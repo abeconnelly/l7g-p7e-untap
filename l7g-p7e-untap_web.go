@@ -25,13 +25,13 @@ func (lpud *LPUD) WebDefault(w http.ResponseWriter, req *http.Request) {
 }
 
 func (lpud *LPUD) WebAbout(w http.ResponseWriter, req *http.Request) {
-  str,e := ioutil.ReadFile("html/about.html")
+  str,e := ioutil.ReadFile( lpud.HTMLDir + "/about.html")
   if e!=nil { io.WriteString(w, "error") ; return }
   io.WriteString(w, string(str))
 }
 
 func (lpud *LPUD) WebInteractive(w http.ResponseWriter, req *http.Request) {
-  str,e := ioutil.ReadFile("html/index.html")
+  str,e := ioutil.ReadFile( lpud.HTMLDir + "/index.html")
   if e!=nil { io.WriteString(w, "error") ; return }
   io.WriteString(w, string(str))
 }
