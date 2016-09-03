@@ -161,7 +161,8 @@ var g_end_timer = new Date();
 function sendreq() {
   var v = document.getElementById("text").value;
   //var url = "http://localhost:8083/exec";
-  var url = "/exec";
+  //var url = "/exec";
+  var url = "exec";
 
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {

@@ -55,8 +55,11 @@ func (lpud *LPUD) WebExec(w http.ResponseWriter, req *http.Request) {
 func (lpud *LPUD) StartSrv() error {
   http.HandleFunc("/", lpud.WebDefault)
   http.HandleFunc("/exec", lpud.WebExec)
+  http.HandleFunc("/exec/", lpud.WebExec)
   http.HandleFunc("/about", lpud.WebAbout)
+  http.HandleFunc("/about/", lpud.WebAbout)
   http.HandleFunc("/i", lpud.WebInteractive)
+  http.HandleFunc("/i/", lpud.WebInteractive)
 
   port_str := fmt.Sprintf("%d", lpud.Port)
   e := http.ListenAndServe(":" + port_str, nil)
